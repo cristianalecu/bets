@@ -1,4 +1,5 @@
-if %computername%==L560-CNA set https_proxy=http://192.168.1.29:8080
+rem user proxy to get requirements
+if %computername%==L560-CNA if [%2]==[p] set https_proxy=http://192.168.1.29:8080
 
 call env.bat
 
