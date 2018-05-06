@@ -12,6 +12,8 @@ call git config --global user.email cristian.alecu@gmail.com
 
 rem call git remote rm origin
 call git remote add origin https://github.com/cristianalecu/Rest.git
+call git pull origin master
+call git push --set-upstream origin master
 
 cd ..
 
@@ -19,11 +21,11 @@ cd ..
 
 cd Rest
 
-call pull.bat
+git pull
 
 cd best_rest
 
-st.bat r s
+st.bat r p
 
 
 GOTO EOF
