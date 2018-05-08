@@ -2,7 +2,7 @@ from snippets.models import Snippet
 from snippets.serializers import SnippetSerializer
 from rest_framework import generics
 from rest_framework import permissions
-from snippets.permissions import IsOwnerOrStaff
+from restuser.permissions import IsOwnerOrStaff
 
 class SnippetList(generics.ListCreateAPIView):
     queryset = Snippet.objects.all() 
