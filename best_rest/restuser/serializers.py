@@ -4,5 +4,5 @@ from restuser.models import RestUser
 class RestUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = RestUser
-        fields = ('id', 'owner', 'myemail', 'mypassword')
+        fields = ('id', 'myemail', 'mypassword')
         

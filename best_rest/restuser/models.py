@@ -14,19 +14,26 @@ class RestUser(models.Model):
     myemail = models.EmailField(blank=True)
     mypassword = models.CharField(blank=True,max_length=128)
     
-    def save(self, *args, **kwargs):
-        if( not self.id):
-            self.user = User.objects.create(password=self.mypassword, username=self.myemail, email=self.myemail)
-            
+    def save(self, *args, **kwargs):    
+        if self.id:  # anybody can create only user owner or staff can update
+            self.user.email=self.myemail
+            self.user.username=self.myemail
+            self.user.set_password(self.mypassword)
+            self.user.save()
         self.mypassword = ''
         self.myemail = ''
         super(RestUser, self).save(*args, **kwargs)
         
+    def __str__(self):
+        return '%s' % (self.user.username)
+        
     @receiver(post_save, sender=User)
-    def create_user_restuser(self, instance, created, **kwargs):
+    def create_user_restuser(instance, created, **kwargs):
         if created:
-            RestUser.objects.create(user=instance)
+            if instance.username == '__RestUser__':
+                instance.username = instance.email
+                instance.save()
+            else:
+                RestUser.objects.create(user=instance)
+
     
-    @receiver(post_save, sender=User)
-    def save_user_restuser(self, instance, **kwargs):
-        instance.restuser.save()
