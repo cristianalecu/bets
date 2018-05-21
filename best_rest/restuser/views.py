@@ -24,21 +24,18 @@ class RestUserList(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        serializer = RestUserSerializer(data=request.data)
+        serializer = RestUserSerializer(data=request.data) 
         if serializer.is_valid():
-            users1 = User.objects.all().filter(username='__RestUser__')
-            if users1.count() > 0:
-                users1[0].delete()
-            users2 = User.objects.all().filter(username=self.request.data['myemail'])
-            users3 = User.objects.all().filter(email=self.request.data['myemail'])
-            if users2.count() == 0 and users3.count() == 0:
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                if users2.count():
-                    return Response({'duplicate':'duplicate email'}, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    return Response({'duplicate':'duplicate email'}, status=status.HTTP_400_BAD_REQUEST)
+            if 'code' in request.data.keys():
+                if request.data['code'] == '1':   # create validation code
+                    serializer.save()
+                    return Response({'incorrect':request.data['code']}, status=status.HTTP_400_BAD_REQUEST)
+                if request.data['code'] == '2' and 'validation_code' in request.data.keys():   # get validation code 
+                    serializer.save()
+                    return Response({'not found':request.data['code']}, status=status.HTTP_400_BAD_REQUEST)
+                if request.data['code'] == '3' and 'validation_code' in request.data.keys():   # change password 
+                    serializer.save()
+                    return Response({'bad request':request.data['code']}, status=status.HTTP_400_BAD_REQUEST)
 #                 send_mail(
 #                     'Subject here',
 #                     'Here is the message.',
@@ -46,6 +43,22 @@ class RestUserList(APIView):
 #                     ['to@example.com'],
 #                     fail_silently=False,
 #                     )
+            elif len(self.request.data['mypassword']) < 2:
+                return Response({'incorrect':'password too short'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                users1 = User.objects.all().filter(username='__RestUser__')
+                if users1.count() > 0:
+                    users1[0].delete()
+                users2 = User.objects.all().filter(username=self.request.data['myemail'])
+                users3 = User.objects.all().filter(email=self.request.data['myemail'])
+                if users2.count() == 0 and users3.count() == 0:
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    if users2.count():
+                        return Response({'duplicate':'duplicate email'}, status=status.HTTP_400_BAD_REQUEST)
+                    else:
+                        return Response({'duplicate':'duplicate email'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RestUserDetail(APIView):
